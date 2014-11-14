@@ -1,0 +1,718 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 0  -->
+  <question type="category">
+    <category>
+        <text>$course$/Standard für CS5080.000-WS14/Bayessche Netze</text>
+
+    </category>
+  </question>
+
+<!-- question: 44225  -->
+  <question type="multichoice">
+    <name>
+      <text>Welches ist eine Wahrscheinlichkeitsfunktion?</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Gegeben zwei Zufallsvariablen <span class="math"><em>X</em>, <em>Y</em></span> mit <span class="math">Val(<em>X</em>) = {0, 1}, Val(<em>Y</em>) = {0, 1, 2}</span>. Welche der folgenden Funktionen ist eine gültige Wahrscheinlichkeitsfunktion?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>5.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>false</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="50" format="html">
+      <text><![CDATA[<table rules="all">
+  <tbody>
+    <tr class="odd">
+      <td align="left"></td>
+      <td align="left"><span class="math"><em>x</em><sup>0</sup></span>
+      </td>
+      <td align="left"><span class="math"><em>x</em><sup>1</sup></span>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>0</sup></span>
+      </td>
+      <td align="left">0</td>
+      <td align="left">0</td>
+    </tr>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>y</em><sup>1</sup></span>
+      </td>
+      <td align="left">0</td>
+      <td align="left">1</td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>2</sup></span>
+      </td>
+      <td align="left">0</td>
+      <td align="left">0</td>
+    </tr>
+  </tbody>
+</table>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<table rules="all">
+  <tbody>
+    <tr class="odd">
+      <td align="left"></td>
+      <td align="left"><span class="math"><em>x</em><sup>0</sup></span>
+      </td>
+      <td align="left"><span class="math"><em>x</em><sup>1</sup></span>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>0</sup></span>
+      </td>
+      <td align="left">0</td>
+      <td align="left">1
+        <br>
+      </td>
+    </tr>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>y</em><sup>1</sup></span>
+      </td>
+      <td align="left">0</td>
+      <td align="left">1</td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>2</sup></span>
+      </td>
+      <td align="left">0</td>
+      <td align="left">1</td>
+    </tr>
+  </tbody>
+</table>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="50" format="html">
+      <text><![CDATA[<table rules="all">
+  <tbody>
+    <tr class="odd">
+      <td align="left"></td>
+      <td align="left"><span class="math"><em>x</em><sup>0</sup></span>
+      </td>
+      <td align="left"><span class="math"><em>x</em><sup>1</sup></span>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>0</sup></span>
+      </td>
+      <td align="left">0.1</td>
+      <td align="left">0.15
+        <br>
+      </td>
+    </tr>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>y</em><sup>1</sup></span>
+      </td>
+      <td align="left">0.15
+        <br>
+      </td>
+      <td align="left">0.2
+        <br>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>2</sup></span>
+      </td>
+      <td align="left">0.1
+        <br>
+      </td>
+      <td align="left">0.3
+        <br>
+      </td>
+    </tr>
+  </tbody>
+</table>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<table rules="all">
+  <tbody>
+    <tr class="odd">
+      <td align="left"></td>
+      <td align="left"><span class="math"><em>x</em><sup>0</sup></span>
+      </td>
+      <td align="left"><span class="math"><em>x</em><sup>1</sup></span>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>0</sup></span>
+      </td>
+      <td align="left">-0.1
+        <br>
+      </td>
+      <td align="left">0.2
+        <br>
+      </td>
+    </tr>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>y</em><sup>1</sup></span>
+      </td>
+      <td align="left">0.3
+        <br>
+      </td>
+      <td align="left">0.3
+        <br>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>2</sup></span>
+      </td>
+      <td align="left">0.1
+        <br>
+      </td>
+      <td align="left">0.2
+        <br>
+      </td>
+    </tr>
+  </tbody>
+</table>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<table rules="all">
+  <tbody>
+    <tr class="odd">
+      <td align="left"></td>
+      <td align="left"><span class="math"><em>x</em><sup>0</sup></span>
+      </td>
+      <td align="left"><span class="math"><em>x</em><sup>1</sup></span>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>0</sup></span>
+      </td>
+      <td align="left">0.2
+        <br>
+      </td>
+      <td align="left">0.3
+        <br>
+      </td>
+    </tr>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>y</em><sup>1</sup></span>
+      </td>
+      <td align="left">0.1
+        <br>
+      </td>
+      <td align="left">0.2
+        <br>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>2</sup></span>
+      </td>
+      <td align="left">0.3
+        <br>
+      </td>
+      <td align="left">0.2
+        <br>
+      </td>
+    </tr>
+  </tbody>
+</table>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+  </question>
+
+<!-- question: 44226  -->
+  <question type="numerical">
+    <name>
+      <text>Bedingte Wahrscheinlichkeit berechnen, bivariat</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Gegeben eine bivariate Wahrscheinlichkeitsverteilung <span class="math"><em>P,</em></span> definiert durch folgende Wahrscheinlichkeitsfunktion:</p>
+<table>
+  <tbody>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>P</em></span>
+        <br>
+      </td>
+      <td align="right"><span class="math"><em>x</em><sup>0</sup></span>
+      </td>
+      <td align="right"><span class="math"><em>x</em><sup>1</sup></span>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>0</sup></span>
+      </td>
+      <td align="right">0.02</td>
+      <td align="right">0.28</td>
+    </tr>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>y</em><sup>1</sup></span>
+      </td>
+      <td align="right">0.08</td>
+      <td align="right">0.62</td>
+    </tr>
+  </tbody>
+</table>
+<p>Berechnen Sie die bedingte Wahrscheinlichkeit <span class="math"><em>P</em>(<em>y</em><sup>1</sup>|<em>x</em><sup>0</sup>)</span>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>0.8</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+      <tolerance>0</tolerance>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>0.08</text>
+      <feedback format="html">
+        <text><![CDATA[<p>Nach der Konditionierung muss renormalisiert werden.<br></p>]]></text>
+      </feedback>
+      <tolerance>0</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+
+<!-- question: 44213  -->
+  <question type="numerical">
+    <name>
+      <text>Marginale Wahrscheinlichkeit, bivariat</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Gegeben eine bivariate Wahrscheinlichkeitsverteilung <span class="math"><em>P</em></span> definiert durch folgende Wahrscheinlichkeitsfunktion</p>
+<table>
+  <tbody>
+        <tr class="header">
+      <th align="left"><span class="math"><em>p</em></span>
+      </th>
+      <th align="right"><span class="math"><em>x</em><sup>0</sup></span>
+      </th>
+      <th align="right"><span class="math"><em>x</em><sup>1</sup></span>
+      </th>
+    </tr>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>y</em><sup>0</sup></span>
+      </td>
+      <td align="right">0.15</td>
+      <td align="right">0.35</td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>1</sup></span>
+      </td>
+      <td align="right">0.41</td>
+      <td align="right">0.09</td>
+    </tr>
+  </tbody>
+</table>
+<p>Berechnen Sie die marginale Wahrscheinlichkeit von <span class="math"><em>P</em>(<em>x</em><sup>1</sup>)</span>.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p>Marginale Wahrscheinlichkeiten werden durch Summation über die Belegungen aller <i>anderen</i> Variablen berechnet.<br></p>]]></text>
+    </generalfeedback>
+    <defaultgrade>2.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>0.44</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+      <tolerance>0</tolerance>
+    </answer>
+    <unitgradingtype>0</unitgradingtype>
+    <unitpenalty>0.1000000</unitpenalty>
+    <showunits>3</showunits>
+    <unitsleft>0</unitsleft>
+  </question>
+
+<!-- question: 44230  -->
+  <question type="oumultiresponse">
+    <name>
+      <text>Minimales Markov Blanket</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>
+  Gegeben folgende BN-Struktur <i>G</i>:
+  <br>
+  <svg width="206pt" height="332pt" viewBox="0.00 0.00 206.00 332.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 328)">
+      %3
+      <polygon fill="white" stroke="none" points="-4,4 -4,-328 202,-328 202,4 -4,4"></polygon>
+
+      <g id="node1" class="node">A
+        <ellipse fill="none" stroke="black" cx="99" cy="-306" rx="27" ry="18"></ellipse>
+        <text text-anchor="middle" x="99" y="-302.3" font-family="Times,serif" font-size="14.00">A</text>
+      </g>
+
+      <g id="node2" class="node">B
+        <ellipse fill="none" stroke="black" cx="63" cy="-234" rx="27" ry="18"></ellipse>
+        <text text-anchor="middle" x="63" y="-230.3" font-family="Times,serif" font-size="14.00">B</text>
+      </g>
+
+      <g id="edge1" class="edge">A-&gt;B
+        <path fill="none" stroke="black" d="M90.6504,-288.765C86.2885,-280.283 80.8531,-269.714 75.9587,-260.197"></path>
+        <polygon fill="black" stroke="black" points="78.9904,-258.439 71.3043,-251.147 72.7654,-261.641 78.9904,-258.439"></polygon>
+      </g>
+
+      <g id="node4" class="node">D
+        <ellipse fill="none" stroke="black" cx="135" cy="-234" rx="27" ry="18"></ellipse>
+        <text text-anchor="middle" x="135" y="-230.3" font-family="Times,serif" font-size="14.00">D</text>
+      </g>
+
+      <g id="edge3" class="edge">A-&gt;D
+        <path fill="none" stroke="black" d="M107.35,-288.765C111.712,-280.283 117.147,-269.714 122.041,-260.197"></path>
+        <polygon fill="black" stroke="black" points="125.235,-261.641 126.696,-251.147 119.01,-258.439 125.235,-261.641"></polygon>
+      </g>
+
+      <g id="node3" class="node">C
+        <ellipse fill="none" stroke="black" cx="27" cy="-162" rx="27" ry="18"></ellipse>
+        <text text-anchor="middle" x="27" y="-158.3" font-family="Times,serif" font-size="14.00">C</text>
+      </g>
+
+      <g id="edge2" class="edge">B-&gt;C
+        <path fill="none" stroke="black" d="M54.6504,-216.765C50.2885,-208.283 44.8531,-197.714 39.9587,-188.197"></path>
+        <polygon fill="black" stroke="black" points="42.9904,-186.439 35.3043,-179.147 36.7654,-189.641 42.9904,-186.439"></polygon>
+      </g>
+
+      <g id="node5" class="node">E
+        <ellipse fill="none" stroke="black" cx="99" cy="-162" rx="27" ry="18"></ellipse>
+        <text text-anchor="middle" x="99" y="-158.3" font-family="Times,serif" font-size="14.00">E</text>
+      </g>
+
+      <g id="edge5" class="edge">B-&gt;E
+        <path fill="none" stroke="black" d="M71.3496,-216.765C75.7115,-208.283 81.1469,-197.714 86.0413,-188.197"></path>
+        <polygon fill="black" stroke="black" points="89.2346,-189.641 90.6957,-179.147 83.0096,-186.439 89.2346,-189.641"></polygon>
+      </g>
+
+      <g id="node6" class="node">F
+        <ellipse fill="none" stroke="black" cx="45" cy="-90" rx="27" ry="18"></ellipse>
+        <text text-anchor="middle" x="45" y="-86.3" font-family="Times,serif" font-size="14.00">F</text>
+      </g>
+
+      <g id="edge7" class="edge">C-&gt;F
+        <path fill="none" stroke="black" d="M31.3573,-144.055C33.3914,-136.145 35.8612,-126.54 38.1374,-117.688"></path>
+        <polygon fill="black" stroke="black" points="41.5821,-118.346 40.6828,-107.789 34.8026,-116.602 41.5821,-118.346"></polygon>
+      </g>
+
+      <g id="edge4" class="edge">D-&gt;E
+        <path fill="none" stroke="black" d="M126.65,-216.765C122.288,-208.283 116.853,-197.714 111.959,-188.197"></path>
+        <polygon fill="black" stroke="black" points="114.99,-186.439 107.304,-179.147 108.765,-189.641 114.99,-186.439"></polygon>
+      </g>
+
+      <g id="node7" class="node">G
+        <ellipse fill="none" stroke="black" cx="171" cy="-162" rx="27" ry="18"></ellipse>
+        <text text-anchor="middle" x="171" y="-158.3" font-family="Times,serif" font-size="14.00">G</text>
+      </g>
+
+      <g id="edge8" class="edge">D-&gt;G
+        <path fill="none" stroke="black" d="M143.35,-216.765C147.712,-208.283 153.147,-197.714 158.041,-188.197"></path>
+        <polygon fill="black" stroke="black" points="161.235,-189.641 162.696,-179.147 155.01,-186.439 161.235,-189.641"></polygon>
+      </g>
+
+      <g id="edge6" class="edge">E-&gt;F
+        <path fill="none" stroke="black" d="M87.0156,-145.465C80.0245,-136.402 71.0638,-124.786 63.2149,-114.612"></path>
+        <polygon fill="black" stroke="black" points="65.8302,-112.272 56.9508,-106.492 60.2877,-116.548 65.8302,-112.272"></polygon>
+      </g>
+
+      <g id="node8" class="node">H
+        <ellipse fill="none" stroke="black" cx="153" cy="-90" rx="27" ry="18"></ellipse>
+        <text text-anchor="middle" x="153" y="-86.3" font-family="Times,serif" font-size="14.00">H</text>
+      </g>
+
+      <g id="edge10" class="edge">E-&gt;H
+        <path fill="none" stroke="black" d="M110.984,-145.465C117.976,-136.402 126.936,-124.786 134.785,-114.612"></path>
+        <polygon fill="black" stroke="black" points="137.712,-116.548 141.049,-106.492 132.17,-112.272 137.712,-116.548"></polygon>
+      </g>
+
+      <g id="node9" class="node">I
+        <ellipse fill="none" stroke="black" cx="45" cy="-18" rx="27" ry="18"></ellipse>
+        <text text-anchor="middle" x="45" y="-14.3" font-family="Times,serif" font-size="14.00">I</text>
+      </g>
+
+      <g id="edge11" class="edge">F-&gt;I
+        <path fill="none" stroke="black" d="M45,-71.6966C45,-63.9827 45,-54.7125 45,-46.1124"></path>
+        <polygon fill="black" stroke="black" points="48.5001,-46.1043 45,-36.1043 41.5001,-46.1044 48.5001,-46.1043"></polygon>
+      </g>
+
+      <g id="edge9" class="edge">G-&gt;H
+        <path fill="none" stroke="black" d="M166.643,-144.055C164.609,-136.145 162.139,-126.54 159.863,-117.688"></path>
+        <polygon fill="black" stroke="black" points="163.197,-116.602 157.317,-107.789 156.418,-118.346 163.197,-116.602"></polygon>
+      </g>
+    </g>
+  </svg>
+</p>
+<p>
+  Welche Zufallsvariablen gehören (in den zu <i>G </i>kompatiblen<i> </i>Wahrscheinlichkeitsverteilungen) zum <b>minimalen</b> Markov Blanket von Variable <i>E</i> ?<br></p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p>Das Markov Blanket von <i>E</i> beinhaltet die Zufallsvariablen <i><b>X</b></i>, so dass&nbsp;<i>E</i> von allen anderen Zufallsvariablen stochastisch unabhängig gegeben <i><b>X</b></i> ist. Ein <i>minimale</i>s Markov Blanket ist ein Markov Blanket, dass diese Eigenschaft verliert sobald eine Variable entfernt wird.<br></p>]]></text>
+    </generalfeedback>
+    <defaultgrade>5.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <shuffleanswers>false</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>A<br></p>]]></text>
+      <feedback format="html">
+        <text><![CDATA[<p>Unabhängig von <i>E</i> gegeben <i>B</i> und <i>D</i>.<br></p>]]></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>B<br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>C<br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>D<br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>F<br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>G<br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>H<br></p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>I<br></p>]]></text>
+      <feedback format="html">
+        <text><![CDATA[<p>Unabhängig von <i>E</i> gegeben <i>F</i>.<br></p>]]></text>
+      </feedback>
+    </answer>
+  </question>
+
+<!-- question: 44227  -->
+  <question type="shortanswer">
+    <name>
+      <text>Anzahl Parameter, bivariat, unabhängig</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Wieviele Parameter sind nötig, um eine Wahrscheinlichkeitsfunktion für eine multivariate Wahrscheinlichkeitsverteilung über den Zufallsvariablen <span class="math"><em>X</em>, <em>Y</em><em></em></span> mit <span class="math">Val(<em>X</em>) = {0, 1}, Val(<em>Y</em>) = {0, 1, 2, 3}</span> eindeutig
+  zu definieren, wenn beide Variablen stochastisch unabhängig sind (<span class="math"><em>P</em> ⊨ <em>I</em>(<em>X</em>, <em>Y</em>)</span>)?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>3.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <usecase>0</usecase>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>4</text>
+      <feedback format="html">
+        <text><![CDATA[<p>Marginale Wahrscheinlichkeitsverteilung über X: 1 Parameter; marginale Wahrscheinlichkeitsverteilung über Y: 3 Parameter.<br></p>]]></text>
+      </feedback>
+    </answer>
+  </question>
+
+<!-- question: 44222  -->
+  <question type="shortanswer">
+    <name>
+      <text>Anzahl Parameter, multivariate Verteilung</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Wieviel Parameter sind nötig um eine Wahrscheinlichkeitsfunktion für eine multivariate Wahrscheinlichkeitsverteilung über die Zufallsvariablen <span class="math"><em>X</em>, <em>Y</em>, <em>Z</em></span> mit <span class="math">Val(<em>X</em>) = {0, 1}, Val(<em>Y</em>) = {0, 1, 2, 3}, Val(<em>Z</em>) = {0, 1, 2, 3}</span> eindeutig zu definieren?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>4.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <usecase>0</usecase>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>31</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>9</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>10</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>17</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+  </question>
+
+<!-- question: 44214  -->
+  <question type="truefalse">
+    <name>
+      <text>Stochastische Unabhängigkeit, bivariat</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Gegeben eine bivariate Wahrscheinlichkeitsverteilung <span class="math"><em>P</em></span> definiert durch folgende Wahrscheinlichkeitsfunktion:</p>
+<table>
+  <tbody>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>P</em></span>
+        <br>
+      </td>
+      <td align="right"><span class="math"><em>x</em><sup>0</sup></span>
+      </td>
+      <td align="right"><span class="math"><em>x</em><sup>1</sup></span>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>0</sup></span>
+      </td>
+      <td align="right">0.02</td>
+      <td align="right">0.18</td>
+    </tr>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>y</em><sup>1</sup></span>
+      </td>
+      <td align="right">0.08</td>
+      <td align="right">0.72</td>
+    </tr>
+  </tbody>
+</table>
+<p>Sind die Zufallsvariablen <span class="math"><em>X</em></span> und <span class="math"><em>Y</em></span> stochastisch unabhängig in <span class="math"><em>P</em></span>?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>5.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text><![CDATA[<p><span class="math"><em>X</em></span> und <span class="math"><em>Y</em></span> sind genau dann stochastisch unabhängig, wenn gilt <span class="math"><em>P</em>(<em>x</em>, <em>y</em>) = <em>P</em>(<em>x</em>) ⋅ <em>P</em>(<em>y</em>)</span>.</p>]]></text>
+      </feedback>
+    </answer>
+  </question>
+
+<!-- question: 44215  -->
+  <question type="truefalse">
+    <name>
+      <text>Stochastische Unabhängigkeit, bivariat (2)</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Gegeben eine bivariate Wahrscheinlichkeitsverteilung <span class="math"><em>P</em></span> definiert durch folgende Wahrscheinlichkeitsfunktion:</p>
+<table>
+  <tbody>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>P</em></span>
+        <br>
+      </td>
+      <td align="right"><span class="math"><em>x</em><sup>0</sup></span>
+      </td>
+      <td align="right"><span class="math"><em>x</em><sup>1</sup></span>
+      </td>
+    </tr>
+    <tr class="even">
+      <td align="left"><span class="math"><em>y</em><sup>0</sup></span>
+      </td>
+      <td align="right">0.1</td>
+      <td align="right">0.05</td>
+    </tr>
+    <tr class="odd">
+      <td align="left"><span class="math"><em>y</em><sup>1</sup></span>
+      </td>
+      <td align="right">0.05</td>
+      <td align="right">0.8</td>
+    </tr>
+  </tbody>
+</table>
+<p>Sind die Zufallsvariablen <span class="math"><em>X</em></span> und <span class="math"><em>Y</em></span> stochastisch unabhängig in <span class="math"><em>P</em></span>?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>5.0000000</defaultgrade>
+    <penalty>1.0000000</penalty>
+    <hidden>0</hidden>
+    <answer fraction="0" format="moodle_auto_format">
+      <text>true</text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="100" format="moodle_auto_format">
+      <text>false</text>
+      <feedback format="html">
+        <text><![CDATA[<p><span class="math"><em>X</em></span> und <span class="math"><em>Y</em></span> sind genau dann stochastisch unabhängig, wenn gilt <span class="math"><em>P</em>(<em>x</em>, <em>y</em>) = <em>P</em>(<em>x</em>) ⋅ <em>P</em>(<em>y</em>)</span>.</p>]]></text>
+      </feedback>
+    </answer>
+  </question>
+
+</quiz>
