@@ -1,8 +1,8 @@
-#Question name {.truefalse}
+#Question name 
 
 Question body is found here.
 ```tikz
-Can include interpreted code for tikz or graphviz
+\draw (0,0) node {a} -- +(1,0) node {b};
 ```
 
 Can also use formulas $\sum_i \frac{x^i}{i}$!
@@ -14,9 +14,10 @@ Can also include item lists
 
 > If you cant figure it out, think harder!
 
-##Answers
-- {100} each answer is a single bullet point
-    - This is right because I said so
-      This is the single correct answer
-- this is a wrong answer
-        > Because I said so.
+##Answers {.truefalse}
+- true: each answer is a single bullet point
+
+    > because
++ false: this is a wrong answer
+
+    > bacon    
