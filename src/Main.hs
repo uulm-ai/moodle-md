@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import Text.Parsec
 import Text.Pandoc
 import Text.Pandoc.Definition
 
@@ -22,15 +23,22 @@ isHeader :: Int -> Block -> Bool
 isHeader lvl (Header lvl' _ _) = lvl == lvl' 
 isHeader _ _ = False
 
-extractHeaders :: Int -> [Block] -> ([Block],[(Block, [Block])])
-extractHeaders level doc = (pre, shatter [] rest)
-    where spanH = span (not.isHeader level)
-          (pre,rest) = spanH doc
-          shatter :: [(Block,[Block])] -> [Block] -> [(Block,[Block])] 
-          shatter acc [] = reverse acc
-          shatter acc (h:r) = 
-                let (pre',rest') = spanH r 
-                in shatter ((h,pre'):acc) rest'
+
+myToken ::  (Show a) => (a -> Bool) -> Parsec [a] () a
+myToken test = tokenPrim show incPos $ justIf test where
+  incPos pos _ _ = incSourceColumn pos 1
+  justIf test x = if (test x) then Just x else Nothing
+
+extractHeaders :: Int -> [Block] -> [(Block, [Block])]
+extractHeaders level doc = case parse (many docs) "your list" doc of
+        Left err -> error $ show err
+        Right result -> result
+    where h1 = myToken $ isHeader level
+          notH1 = myToken $ not . isHeader level
+          docs = do
+            header <- h1
+            rest <- many notH1
+            return (header,rest)
     
 
 readExample :: IO Pandoc
