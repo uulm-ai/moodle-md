@@ -15,14 +15,32 @@ Can also include item lists
 > If you cant figure it out, think harder!
 
 ##Answers {.truefalse}
-- 100: each answer is a single bullet point
-    > because
-- 0: this is a wrong answer
+true 
+
+ :  each answer is a single bullet point
+
+    > Feedback is a comment with an empty line above.
+
+ :  also correct
+
+false
+ :  wrong answer
+
     > bacon    
 
 #Second Question
 To be or not to be?
 
 ##Answers {.truefalse}
-- 100: to be
-- 0: not to be
+
+100
+
+ :  to be
+
+50
+
+ :  not to be
+
+false
+
+ :  something else
