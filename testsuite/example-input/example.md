@@ -15,14 +15,14 @@ Can also include item lists
 > If you cant figure it out, think harder!
 
 ##Answers {.truefalse}
-- true: each answer is a single bullet point
+- 100: each answer is a single bullet point
     > because
-+ false: this is a wrong answer
+- 0: this is a wrong answer
     > bacon    
 
 #Second Question
 To be or not to be?
 
 ##Answers {.truefalse}
-- +: to be
-- -: not to be
+- 100: to be
+- 0: not to be
