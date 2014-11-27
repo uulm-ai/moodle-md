@@ -6,7 +6,7 @@ import System.Environment
 
 main ::  IO ()
 main = do
-    args <- getArgs
-    fileContent <- readFile $ head args
-    putStrLn . either show renderQs . parseMoodle $ readMarkdown def fileContent
+    f <- fmap head getArgs
+    result <- readMoodleMDFile f
+    putStrLn . either show renderQs $ result
 

@@ -1,4 +1,4 @@
-module Text.MoodleMD.Reader (parseMoodle) where
+module Text.MoodleMD.Reader (pandoc2questions, parseMoodleMD, readMoodleMDFile) where
 
 import Text.MoodleMD.Types
 import Text.Pandoc
@@ -65,8 +65,8 @@ answerDefList qType = tokenPrim show incPos (\blk -> case blk of
 answersFromAttr :: Attr -> String
 answersFromAttr (_,classes,_) = head classes
 
-parseMoodle :: Pandoc -> Either ParseError [Question]
-parseMoodle (Pandoc _ text) = parse (many question) "input" text
+pandoc2questions :: Pandoc -> Either ParseError [Question]
+pandoc2questions (Pandoc _ text) = parse (many question) "input" text
     where noHeader = tokenPrim show incPos (\blk -> case blk of
               Header _ _ _ -> Nothing
               x            -> Just x)
@@ -86,3 +86,9 @@ parseMoodle (Pandoc _ text) = parse (many question) "input" text
             answers <- answerDefList $ answersFromAttr aAttr
 --            skipMany noHeader
             return $ Question (inlinesToString tInlines) qBody answers
+
+parseMoodleMD :: String -> Either ParseError [Question]
+parseMoodleMD = pandoc2questions . readMarkdown def
+
+readMoodleMDFile :: FilePath -> IO (Either ParseError [Question])
+readMoodleMDFile file = fmap parseMoodleMD $ readFile file
