@@ -21,8 +21,9 @@ executable moodle-md
   -- other-extensions:    
   build-depends:       base >=4.6 && <4.7,
                        mtl,
-                       pandoc >= 1.13.1, xml (>=1.3.12 && <1.4), 
+                       pandoc >= 1.13.1,
                        pandoc-types >= 1.12.4.1,
+                       xml,
                        parsec,
                        highlighting-kate
             
