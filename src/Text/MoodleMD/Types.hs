@@ -27,10 +27,10 @@ answerContent (Multichoice x) = Left x
 answerContent (TrueFalse x) = Left x
 answerContent (Numerical x) = Right x
 
-makeStringAnswers :: String -> [(Text,AnswerProp)] -> Answers
-makeStringAnswers "multichoice" as = Multichoice as
-makeStringAnswers "truefalse"   as = TrueFalse as
-makeStringAnswers t _ = error $ "unknown question type: " ++ t
+makeStringAnswers :: String -> [(Text,AnswerProp)] -> Either String Answers
+makeStringAnswers "multichoice" as = Right $ Multichoice as
+makeStringAnswers "truefalse"   as = Right $ TrueFalse as
+makeStringAnswers t _ = Left $ "unknown question type: " ++ t
 
 -- |A question body consisting of a title, a Body, and an Answer option.
 data Question = Question String Text Answers deriving Show

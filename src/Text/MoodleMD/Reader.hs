@@ -3,9 +3,12 @@ module Text.MoodleMD.Reader (parseMoodle) where
 import Text.MoodleMD.Types
 import Text.Pandoc
 import Text.Parsec
-import Control.Applicative ((<*))
+import Text.Parsec.Token
+import Text.Parsec.Language (javaStyle)
 import Control.Arrow
 import Data.Tuple (swap)
+import GHC.Float
+import Data.Maybe (fromMaybe)
 
 -- |Helper to increment Source position parsing arbitrary lists with Parsec
 incPos pos _ _ = incSourceColumn pos 1
@@ -14,11 +17,8 @@ incPos pos _ _ = incSourceColumn pos 1
 inlinesToString :: [Inline] -> String
 inlinesToString inls = writeAsciiDoc def $ Pandoc nullMeta [Plain inls]
 
--- |Parse some blocks (this will be changed)
-readStringAnswer :: [Block] -> Maybe (Text,AnswerProp)
-readStringAnswer ((Plain ((Str score):rest)):rrest) = either (const Nothing) Just. fmap (\sc -> (Plain rest:rrest,AnswerProp sc [])) $ parse scoreP "score block" score
-    where scoreP = fmap read $ many1 digit <* char ':'
-readStringAnswer _ = Nothing
+textToString :: Text -> String
+textToString = writeAsciiDoc def . Pandoc nullMeta
 
 parseAnswerFraction :: [Inline] -> Either ParseError Int
 parseAnswerFraction = parse fraction "answer header" . inlinesToString
@@ -35,17 +35,30 @@ seqSecond (a,mb) = do b <- mb; return (a,b)
 
 freak :: Monad m => [(m a,[b])] -> m [(a,b)]
 freak = sequence . fmap seqFirst . concat . fmap seqSecond
-     
+
+mapLeft :: (a -> b) -> Either a c -> Either b c
+mapLeft f (Left x) = Left $ f x
+mapLeft f (Right r) = Right r
+
+tokenParser = makeTokenParser javaStyle
+
 answerDefList :: String -> Parsec [Block] () Answers
 answerDefList qType = tokenPrim show incPos (\blk -> case blk of
         DefinitionList defs -> Just $ parseAnswers defs
         _                   -> Nothing) >>= either (unexpected.show) return
-    where parseAnswers :: [([Inline],[Text])] -> Either ParseError Answers
-          parseAnswers = fmap constructQuestion . parseStringAnswers
-          constructQuestion :: [(Text,AnswerProp)] -> Answers
-          constructQuestion = if qType == "numerical" then Numerical . fmap (parseNums *** id) else makeStringAnswers qType 
-          parseNums :: Text -> (NumType,NumType)
-          parseNums _ = (0,0)
+    where parseAnswers :: [([Inline],[Text])] -> Either String Answers
+          parseAnswers = (>>= constructQuestion) . mapLeft show . parseStringAnswers
+          constructQuestion :: [(Text,AnswerProp)] -> Either String Answers
+          constructQuestion = if qType == "numerical" then parseNumericAnswers else makeStringAnswers qType
+          parseNums :: Text -> Either String (NumType,NumType)
+          parseNums = mapLeft show . parse numPair "numerical answer" . textToString
+            where buildFloat = either fromIntegral double2Float
+                  numPair = do
+                    targ <- fmap buildFloat $ naturalOrFloat tokenParser
+                    tol <- optionMaybe $ many (char ' ') >> string "+-" >> many (char ' ') >> (fmap buildFloat $ naturalOrFloat tokenParser)
+                    return (targ, fromMaybe 0.01 tol)
+          parseNumericAnswers :: [(Text,AnswerProp)] -> Either String Answers
+          parseNumericAnswers = fmap Numerical . sequence . fmap seqFirst . fmap (parseNums *** id)
           parseStringAnswers :: [([Inline],[Text])] -> Either ParseError [(Text,AnswerProp)]
           parseStringAnswers = fmap (fmap ((id *** (flip AnswerProp) []) . swap)) . freak . fmap (parseAnswerFraction *** id)
 
@@ -55,17 +68,21 @@ answersFromAttr (_,classes,_) = head classes
 parseMoodle :: Pandoc -> Either ParseError [Question]
 parseMoodle (Pandoc _ text) = parse (many question) "input" text
     where noHeader = tokenPrim show incPos (\blk -> case blk of
-            Header _ _ _ -> Nothing
-            x            -> Just x)
+              Header _ _ _ -> Nothing
+              x            -> Just x)
+          noHeaderNoDefList = tokenPrim show incPos (\blk -> case blk of
+              Header _ _ _     -> Nothing
+              DefinitionList _ -> Nothing
+              x                -> Just x)
           headerN :: Int -> Parsec [Block] () (Attr, [Inline])
           headerN level = tokenPrim show incPos (\blk -> case blk of
                 Header lvl' attr inls | lvl' == level -> Just (attr,inls)
                 _                                     -> Nothing)
           question = do
-            (tAttr, tInlines) <- headerN 1
+            (_, tInlines) <- headerN 1
             qBody <- many noHeader
-            (aAttr, aInlines) <- headerN 2
---            skipMany noHeader
+            (aAttr, _) <- headerN 2
+            questionHeader <- many noHeaderNoDefList
             answers <- answerDefList $ answersFromAttr aAttr
 --            skipMany noHeader
             return $ Question (inlinesToString tInlines) qBody answers
