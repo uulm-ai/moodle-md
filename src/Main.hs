@@ -1,13 +1,7 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 import Text.MoodleMD.Types
 import Text.MoodleMD.Reader
-
-import Text.Pandoc hiding (Attr)
-import qualified Text.Pandoc.Definition as PD
-import Text.Pandoc.Writers.AsciiDoc
-import Data.Either (rights)
-import Control.Applicative hiding (many)
+import Text.MoodleMD.WriterXML
+import Text.Pandoc
 
 readExample :: IO Pandoc
 readExample = do

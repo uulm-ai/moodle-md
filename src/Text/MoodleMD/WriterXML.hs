@@ -14,8 +14,6 @@ renderAnswers = either (fmap procTxt) (fmap procNum) . answerContent
 blocksToString :: Text -> String
 blocksToString blks = writeAsciiDoc def $ Pandoc nullMeta blks
 
-
-
 uAttr :: String -> String -> Attr
 uAttr un = Attr $ unqual un
 
