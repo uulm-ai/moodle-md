@@ -36,12 +36,21 @@ seqSecond (a,mb) = do b <- mb; return (a,b)
 freak :: Monad m => [(m a,[b])] -> m [(a,b)]
 freak = sequence . fmap seqFirst . concat . fmap seqSecond
      
-answerDefList :: Parsec [Block] () (Either ParseError [(Int,Text)])
-answerDefList = tokenPrim show incPos (\blk -> case blk of
+answerDefList :: String -> Parsec [Block] () Answers
+answerDefList qType = tokenPrim show incPos (\blk -> case blk of
         DefinitionList defs -> Just $ parseAnswers defs
-        _                   -> Nothing)
-    where parseAnswers :: [([Inline],[Text])] -> Either ParseError [(Int,Text)]
-          parseAnswers = freak . fmap (parseAnswerFraction *** id)
+        _                   -> Nothing) >>= either (unexpected.show) return
+    where parseAnswers :: [([Inline],[Text])] -> Either ParseError Answers
+          parseAnswers = fmap constructQuestion . parseStringAnswers
+          constructQuestion :: [(Text,AnswerProp)] -> Answers
+          constructQuestion = if qType == "numerical" then Numerical . fmap (parseNums *** id) else makeStringAnswers qType 
+          parseNums :: Text -> (NumType,NumType)
+          parseNums _ = (0,0)
+          parseStringAnswers :: [([Inline],[Text])] -> Either ParseError [(Text,AnswerProp)]
+          parseStringAnswers = fmap (fmap ((id *** (flip AnswerProp) []) . swap)) . freak . fmap (parseAnswerFraction *** id)
+
+answersFromAttr :: Attr -> String
+answersFromAttr (_,classes,_) = head classes
 
 parseMoodle :: Pandoc -> Either ParseError [Question]
 parseMoodle (Pandoc _ text) = parse (many question) "input" text
@@ -57,7 +66,6 @@ parseMoodle (Pandoc _ text) = parse (many question) "input" text
             qBody <- many noHeader
             (aAttr, aInlines) <- headerN 2
 --            skipMany noHeader
-            answersList <- answerDefList >>= either (unexpected.show) return 
-            let answers = ShortAnswer $ fmap ((id *** (flip AnswerProp) []) . swap) answersList
+            answers <- answerDefList $ answersFromAttr aAttr
 --            skipMany noHeader
             return $ Question (inlinesToString tInlines) qBody answers

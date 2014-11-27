@@ -31,7 +31,7 @@ false
 #Second Question
 To be or not to be?
 
-##Answers {.truefalse}
+##Answers {.multichoice}
 
 100
 
