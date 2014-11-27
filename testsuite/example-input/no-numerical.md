@@ -15,7 +15,7 @@ Can also include item lists
 > If you cant figure it out, think harder!
 
 ##Answers {.truefalse}
-true 
+true
 
  :  each answer is a single bullet point
 
@@ -26,7 +26,7 @@ true
 false
  :  wrong answer
 
-    > bacon    
+    > bacon
 
 #Second Question
 To be or not to be?
@@ -44,18 +44,3 @@ To be or not to be?
 false
 
  :  something else
-
-#Simple Calculation
-
-What is $3+3$?
-
-##Answers {.numerical}
-
-correct
- :  6+-0
- :  7
-
-wrong
- :  0 +- 0.2
- :  1 +- 0.2
-

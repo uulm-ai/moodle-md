@@ -8,8 +8,13 @@ import Data.Monoid (mempty)
 
 renderAnswers :: Answers -> [Element]
 renderAnswers = either (fmap procTxt) (fmap procNum) . answerContent
-    where procTxt (txt,(AnswerProp fraction _)) = add_attrs [uAttr "format" "html", uAttr "fraction" $ show fraction]. unode "answer" $ makeCData txt
-          procNum ((target,tolerance),props) = undefined
+    where procTxt (txt,(AnswerProp fraction _)) =
+                add_attrs [uAttr "format" "html", uAttr "fraction" $ show fraction] $
+                        unode "answer" $ makeCData txt
+          procNum :: ((NumType,NumType),AnswerProp) -> Element
+          procNum ((target,tolerance),(AnswerProp fraction _)) =
+                add_attrs [uAttr "fraction" $ show fraction] $
+                        unode "answer" $ [unode "text" $ show target, unode "tolerance" $ show tolerance]
 
 blocksToString :: Text -> String
 blocksToString blks = writeAsciiDoc def $ Pandoc nullMeta blks
