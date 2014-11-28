@@ -33,12 +33,9 @@ seqFirst (ma,b) = do a <- ma; return (a,b)
 seqSecond :: Monad m => (a,m b) -> m (a,b)
 seqSecond (a,mb) = do b <- mb; return (a,b)
 
-freak :: Monad m => [(m a,[b])] -> m [(a,b)]
-freak = sequence . fmap seqFirst . concat . fmap seqSecond
-
 mapLeft :: (a -> b) -> Either a c -> Either b c
 mapLeft f (Left x) = Left $ f x
-mapLeft f (Right r) = Right r
+mapLeft _ (Right r) = Right r
 
 tokenParser = makeTokenParser javaStyle
 
@@ -61,31 +58,42 @@ answerDefList qType = tokenPrim show incPos (\blk -> case blk of
           parseNumericAnswers = fmap Numerical . sequence . fmap seqFirst . fmap (parseNums *** id)
           parseStringAnswers :: [([Inline],[Text])] -> Either ParseError [(Text,AnswerProp)]
           parseStringAnswers = fmap (fmap ((id *** (flip AnswerProp) []) . swap)) . freak . fmap (parseAnswerFraction *** id)
+          freak :: Monad m => [(m a,[b])] -> m [(a,b)]
+          freak = sequence . fmap seqFirst . concat . fmap seqSecond
 
 answersFromAttr :: Attr -> String
 answersFromAttr (_,classes,_) = head classes
 
 pandoc2questions :: Pandoc -> Either ParseError [Question]
-pandoc2questions (Pandoc _ text) = parse (many question) "input" text
+pandoc2questions (Pandoc _ text) = fmap concat $ parse (many pQuestionBlock) "input" text
     where noHeader = tokenPrim show incPos (\blk -> case blk of
               Header _ _ _ -> Nothing
               x            -> Just x)
+
           noHeaderNoDefList = tokenPrim show incPos (\blk -> case blk of
               Header _ _ _     -> Nothing
               DefinitionList _ -> Nothing
               x                -> Just x)
-          headerN :: Int -> Parsec [Block] () (Attr, [Inline])
-          headerN level = tokenPrim show incPos (\blk -> case blk of
+
+          headerN :: Int -> Parsec [Block] () (Attr, String)
+          headerN level = fmap (id *** inlinesToString) $ tokenPrim show incPos (\blk -> case blk of
                 Header lvl' attr inls | lvl' == level -> Just (attr,inls)
                 _                                     -> Nothing)
-          question = do
-            (_, tInlines) <- headerN 1
-            qBody <- many noHeader
-            (aAttr, _) <- headerN 2
-            questionHeader <- many noHeaderNoDefList
+
+          -- returns (answer title, answer prefix, answers)
+          pAnswerSection = do
+            (aAttr, aTitle) <- headerN 2
+            aBody <- many noHeaderNoDefList
             answers <- answerDefList $ answersFromAttr aAttr
---            skipMany noHeader
-            return $ Question (inlinesToString tInlines) qBody answers
+            skipMany noHeader
+            return (aTitle,aBody,answers)
+
+          buildAnswer qTitle qBody (aTitle,aPrefix,aBody) = Question (qTitle ++ " - " ++ aTitle) (qBody ++ aPrefix) aBody
+          pQuestionBlock = do
+            (_, questionTitle) <- headerN 1
+            qBody <- many noHeader
+            answerSections <- many $ pAnswerSection
+            return $ fmap (buildAnswer questionTitle qBody) answerSections
 
 parseMoodleMD :: String -> Either ParseError [Question]
 parseMoodleMD = pandoc2questions . readMarkdown def

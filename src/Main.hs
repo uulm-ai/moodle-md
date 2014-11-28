@@ -1,7 +1,6 @@
 import Text.MoodleMD.Types
 import Text.MoodleMD.Reader
 import Text.MoodleMD.WriterXML
-import Text.Pandoc
 import System.Environment
 
 main ::  IO ()

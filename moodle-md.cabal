@@ -22,8 +22,8 @@ executable moodleMD
   -- other-extensions:    
   build-depends:       base >=4.6 && <4.7,
                        mtl,
-                       pandoc >= 1.13.1,
-                       pandoc-types >= 1.12.4.1,
+                       pandoc,
+                       pandoc-types,
                        xml,
                        parsec,
                        highlighting-kate
@@ -39,8 +39,8 @@ test-suite tests
   BUILD-DEPENDS:      base, HUnit
   build-depends:      base >=4.6 && <4.7,
                       mtl,
-                      pandoc >= 1.13.1,
-                      pandoc-types >= 1.12.4.1,
+                      pandoc,
+                      pandoc-types,
                       xml,
                       parsec,
                       highlighting-kate
