@@ -21,3 +21,15 @@ true
 
 false
  ~  mamal
+
+#Third Question
+
+This is ...
+
+##Answers {.multichoice}
+
+true
+ ~  it
+
+false
+ ~  something else

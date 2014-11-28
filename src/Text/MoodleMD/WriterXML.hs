@@ -3,14 +3,14 @@ module Text.MoodleMD.WriterXML where
 import Text.MoodleMD.Types
 import Text.Pandoc hiding (Attr)
 import Text.XML.Light
-import Text.Highlighting.Kate.Styles (kate)
-import Data.Monoid (mempty)
+import Text.Pandoc.SelfContained (makeSelfContained)
 
-renderAnswers :: Answers -> [Element]
-renderAnswers = either (fmap procTxt) (fmap procNum) . answerContent
-    where procTxt (txt,(AnswerProp fraction _)) =
-                add_attrs [uAttr "format" "html", uAttr "fraction" $ show fraction] $
-                        unode "answer" $ makeCData txt
+renderAnswers :: Answers -> IO [Element]
+renderAnswers = either (sequence . fmap procTxt) (return . fmap procNum) . answerContent
+    where procTxt (txt,(AnswerProp fraction _)) = do
+                cdata <- makeCData txt
+                let attributes = [uAttr "format" "html", uAttr "fraction" $ show fraction]
+                return . add_attrs attributes . unode "answer" $ cdata
           procNum :: ((NumType,NumType),AnswerProp) -> Element
           procNum ((target,tolerance),(AnswerProp fraction _)) =
                 add_attrs [uAttr "fraction" $ show fraction] $
@@ -22,56 +22,22 @@ blocksToString blks = writeAsciiDoc def $ Pandoc nullMeta blks
 uAttr :: String -> String -> Attr
 uAttr un = Attr $ unqual un
 
-makeCData :: Text -> Element
-makeCData txt = unode "text" (CData CDataVerbatim asHtml Nothing)
-    where asHtml = writeHtmlString myWriterOptions (Pandoc nullMeta txt)
+makeCData :: Text -> IO Element
+makeCData txt = do
+        content <- asHtml
+        return $ unode "text" (CData CDataVerbatim content Nothing)
+    where asHtml = makeSelfContained def $ writeHtmlString myWriterOptions (Pandoc nullMeta txt)
 
-renderQs :: [Question] -> String            
-renderQs = ppTopElement . unode "quiz" . fmap renderQ
-    where renderQ (Question title body answers) = add_attr typeAttr . unode "question" $ [questionName,questionText] ++ renderAnswers answers
-            where typeAttr = Attr (unqual "type") (answerType answers)
-                  questionName = unode "name" $ unode "text" title
-                  questionText = add_attr (uAttr "format" "html") $ unode "questiontext" $ makeCData body
+renderQs :: [Question] -> IO String
+renderQs = fmap (ppTopElement . unode "quiz") . sequence . fmap renderQ
+    where renderQ (Question title body answers) = do
+            renderedAnswers <- renderAnswers answers
+            let typeAttr = Attr (unqual "type") (answerType answers)
+            let questionName = unode "name" $ unode "text" title
+            qBody <- makeCData body
+            let questionText = add_attr (uAttr "format" "html") $ unode "questiontext" $ qBody
+            return $ add_attr typeAttr . unode "question" $ [questionName,questionText] ++ renderedAnswers
 
 -- |Rendering options for producing HTML with Pandoc.
-myWriterOptions = WriterOptions { writerStandalone       = False
-        , writerTemplate         = ""
-        , writerVariables        = []
-        , writerTabStop          = 4
-        , writerTableOfContents  = False
-        , writerSlideVariant     = NoSlides
-        , writerIncremental      = False
-        , writerHTMLMathMethod   = MathML Nothing
-        , writerIgnoreNotes      = False
-        , writerNumberSections   = False
-        , writerNumberOffset     = [0,0,0,0,0,0]
-        , writerSectionDivs      = False
-        , writerExtensions       = pandocExtensions
-        , writerReferenceLinks   = False
-        , writerWrapText         = True
-        , writerColumns          = 72
-        , writerEmailObfuscation = JavascriptObfuscation
-        , writerIdentifierPrefix = ""
-        , writerSourceURL        = Nothing
-        , writerUserDataDir      = Nothing
-        , writerCiteMethod       = Citeproc
-        , writerHtml5            = False
-        , writerHtmlQTags        = False
-        , writerBeamer           = False
-        , writerSlideLevel       = Nothing
-        , writerChapters         = False
-        , writerListings         = False
-        , writerHighlight        = False
-        , writerHighlightStyle   = kate
-        , writerSetextHeaders    = True
-        , writerTeXLigatures     = True
-        , writerEpubVersion      = Nothing
-        , writerEpubMetadata     = ""
-        , writerEpubStylesheet   = Nothing
-        , writerEpubFonts        = []
-        , writerEpubChapterLevel = 1
-        , writerTOCDepth         = 3
-        , writerReferenceODT     = Nothing
-        , writerReferenceDocx    = Nothing
-        , writerMediaBag         = mempty
-}
+myWriterOptions :: WriterOptions
+myWriterOptions = def {writerHTMLMathMethod   = MathML Nothing}

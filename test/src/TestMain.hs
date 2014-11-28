@@ -8,4 +8,7 @@ parseFile f = TestCase $ do
     result <- readMoodleMDFile f
     assertBool ("file " ++ f ++ " could not be parsed") $ either (const False) (const True) result
 
+checkMultiQuestion = TestCase $ do
+    result <- readMoodleMDFile
+
 main = runTestTT . TestList $ fmap parseFile exampleFiles

@@ -6,6 +6,7 @@ import System.Environment
 main ::  IO ()
 main = do
     f <- fmap head getArgs
-    result <- readMoodleMDFile f
-    putStrLn . either show renderQs $ result
+    result <- fmap (either (error.show) id) $ readMoodleMDFile  f
+    rendered <- renderQs $ result
+    putStrLn $ rendered
 
