@@ -4,7 +4,7 @@ Question body is found here.
 
 > General feedback.
 
-##Answers {.truefalse}
+##Answers {.multichoice}
 true 
  :  each answer is a single bullet point
 
@@ -14,5 +14,5 @@ true
 
 false
  :  wrong answer
- 
+
     > Wrong answer feedback.

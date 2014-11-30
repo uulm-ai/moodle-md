@@ -36,11 +36,25 @@ mapLeft :: (a -> b) -> Either a c -> Either b c
 mapLeft f (Left x) = Left $ f x
 mapLeft _ (Right r) = Right r
 
+numericBlock :: BlockP (NumType,NumType)
+numericBlock = undefined
+
 answerDefList :: String -> BlockP Answers
-answerDefList qType = tokenPrim show incPos (\blk -> case blk of
-        DefinitionList defs -> Just $ parseAnswers defs
-        _                   -> Nothing) >>= either (unexpected.show) return
-    where parseAnswers :: [([Inline],[Text])] -> Either String Answers
+answerDefList qType = defList >>=
+    where withFeedback :: BlockP a -> BlockP (a,Text) -- could be improved by checking that a doesn't consume block quotes
+          withFeedback pa = do
+            a <- pa
+            fb <- fmap (fromMaybe []) optionMaybe blockQuote
+            return (a,fb)
+
+          -- |parse one entry for a numerical question
+          parseNumericAnswerOpt :: BlockP ((NumType,NumType),Text)
+          parseNumericAnswerOpt = withFeedback numericBlock
+
+          parseStringAnswerOpt :: BlockP (Text,Text)
+          parseStringanswerOpt = withFeedback $ many noBlockQuotes
+
+          parseAnswers :: [([Inline],[Text])] -> Either String Answers
           parseAnswers = (>>= constructQuestion) . mapLeft show . parseStringAnswers
           constructQuestion :: [(Text,AnswerProp)] -> Either String Answers
           constructQuestion = if qType == "numerical" then parseNumericAnswers else makeStringAnswers qType
@@ -64,6 +78,11 @@ answerDefList qType = tokenPrim show incPos (\blk -> case blk of
                     fracFalse = (string "false" <|> string "False" <|> string "wrong" <|> string "Wrong") >> return 0
                     numericFraction = fmap read $ many1 digit
 
+
+defList :: BlockP [([Inline],[Text])]
+defList = tokenPrim show incPos (\blk -> case blk of
+                  DefinitionList defs -> Just defs
+                  _                   -> Nothing)
 
 noHeader :: BlockP Block
 noHeader = tokenPrim show incPos (\blk -> case blk of
