@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                moodle-md
-version:             0.1.0.0
+version:             0.1.0
 synopsis:            A markdown-based format for authoring Moodle quizzes together with a converter to Moodle-XML.
 -- description:         
 license:             GPL-3
@@ -36,7 +36,7 @@ test-suite tests
   type:               exitcode-stdio-1.0
   main-is:            TestMain.hs
   hs-source-dirs:     test/src, src
-  BUILD-DEPENDS:      base, HUnit
+  build-depends:      base, HUnit
   build-depends:      base >=4.6 && <4.7,
                       mtl,
                       pandoc,
