@@ -9,23 +9,22 @@ import Control.Arrow
 import Data.Tuple (swap)
 import GHC.Float
 import Data.Maybe (fromMaybe)
+import Control.Applicative (pure)
+
+type BlockP a = Parsec [Block] () a
 
 -- |Helper to increment Source position parsing arbitrary lists with Parsec
 incPos pos _ _ = incSourceColumn pos 1
 
+tokenParser = makeTokenParser javaStyle
+
+-- |Convert to normal string.
+textToString :: Text -> String
+textToString = writePlain def . Pandoc nullMeta
+
 -- |For converting the question title to a normal string.
 inlinesToString :: [Inline] -> String
-inlinesToString inls = writeAsciiDoc def $ Pandoc nullMeta [Plain inls]
-
-textToString :: Text -> String
-textToString = writeAsciiDoc def . Pandoc nullMeta
-
-parseAnswerFraction :: [Inline] -> Either ParseError Int
-parseAnswerFraction = parse fraction "answer header" . inlinesToString
-    where fraction = fracTrue <|> fracFalse <|> numericFraction
-          fracTrue  = (string "true" <|> string "True" <|> string "correct" <|> string "Correct") >> return 100
-          fracFalse = (string "false" <|> string "False" <|> string "wrong" <|> string "Wrong") >> return 0
-          numericFraction = fmap read $ many1 digit 
+inlinesToString = textToString . pure . Plain
 
 seqFirst :: Monad m => (m a,b) -> m (a,b)
 seqFirst (ma,b) = do a <- ma; return (a,b)
@@ -37,9 +36,7 @@ mapLeft :: (a -> b) -> Either a c -> Either b c
 mapLeft f (Left x) = Left $ f x
 mapLeft _ (Right r) = Right r
 
-tokenParser = makeTokenParser javaStyle
-
-answerDefList :: String -> Parsec [Block] () Answers
+answerDefList :: String -> BlockP Answers
 answerDefList qType = tokenPrim show incPos (\blk -> case blk of
         DefinitionList defs -> Just $ parseAnswers defs
         _                   -> Nothing) >>= either (unexpected.show) return
@@ -60,27 +57,50 @@ answerDefList qType = tokenPrim show incPos (\blk -> case blk of
           parseStringAnswers = fmap (fmap ((id *** (flip AnswerProp) []) . swap)) . freak . fmap (parseAnswerFraction *** id)
           freak :: Monad m => [(m a,[b])] -> m [(a,b)]
           freak = sequence . fmap seqFirst . concat . fmap seqSecond
+          parseAnswerFraction :: [Inline] -> Either ParseError Int
+          parseAnswerFraction = parse fraction "answer header" . inlinesToString
+              where fraction = fracTrue <|> fracFalse <|> numericFraction
+                    fracTrue  = (string "true" <|> string "True" <|> string "correct" <|> string "Correct") >> return 100
+                    fracFalse = (string "false" <|> string "False" <|> string "wrong" <|> string "Wrong") >> return 0
+                    numericFraction = fmap read $ many1 digit
+
+
+noHeader :: BlockP Block
+noHeader = tokenPrim show incPos (\blk -> case blk of
+    Header _ _ _ -> Nothing
+    x            -> Just x)
+
+noHeaderNoDefList :: BlockP Block
+noHeaderNoDefList = tokenPrim show incPos (\blk -> case blk of
+    Header _ _ _     -> Nothing
+    DefinitionList _ -> Nothing
+    x                -> Just x)
+
+headerN :: Int -> BlockP (Attr, String)
+headerN level = fmap (id *** inlinesToString) $ tokenPrim show incPos (\blk -> case blk of
+    Header lvl' attr inls | lvl' == level -> Just (attr,inls)
+    _                                     -> Nothing)
+
+blockQuote :: BlockP Text
+blockQuote = tokenPrim show incPos (\blk -> case blk of
+              BlockQuote x -> Just x
+              _            -> Nothing)
+
+noBlockQuotes :: BlockP Text
+noBlockQuotes = many $ tokenPrim show incPos (\blk -> case blk of
+              BlockQuote _ -> Nothing
+              x            -> Just x)
+
 
 answersFromAttr :: Attr -> String
 answersFromAttr (_,classes,_) = head classes
 
 pandoc2questions :: Pandoc -> Either ParseError [Question]
 pandoc2questions (Pandoc _ text) = fmap concat $ parse (many pQuestionBlock) "input" text
-    where noHeader = tokenPrim show incPos (\blk -> case blk of
-              Header _ _ _ -> Nothing
-              x            -> Just x)
-
-          noHeaderNoDefList = tokenPrim show incPos (\blk -> case blk of
-              Header _ _ _     -> Nothing
-              DefinitionList _ -> Nothing
-              x                -> Just x)
-
-          headerN :: Int -> Parsec [Block] () (Attr, String)
-          headerN level = fmap (id *** inlinesToString) $ tokenPrim show incPos (\blk -> case blk of
-                Header lvl' attr inls | lvl' == level -> Just (attr,inls)
-                _                                     -> Nothing)
+    where
 
           -- returns (answer title, answer prefix, answers)
+          pAnswerSection :: BlockP (String, [Block], Answers)
           pAnswerSection = do
             (aAttr, aTitle) <- headerN 2
             aBody <- many noHeaderNoDefList
@@ -88,12 +108,15 @@ pandoc2questions (Pandoc _ text) = fmap concat $ parse (many pQuestionBlock) "in
             skipMany noHeader
             return (aTitle,aBody,answers)
 
-          buildAnswer qTitle qBody (aTitle,aPrefix,aBody) = Question (qTitle ++ " - " ++ aTitle) (qBody ++ aPrefix) aBody
+          pQuestionBlock :: BlockP [Question]
           pQuestionBlock = do
             (_, questionTitle) <- headerN 1
             qBody <- many noHeader
             answerSections <- many $ pAnswerSection
-            return $ fmap (buildAnswer questionTitle qBody) answerSections
+            return $ fmap (buildQuestion questionTitle qBody) answerSections
+          -- Make a question from: question title, question body, (answer title, answer prefix, answers)
+          buildQuestion :: String -> Text -> (String, Text, Answers) -> Question
+          buildQuestion qTitle qBody (aTitle,aPrefix,aBody) = Question (qTitle ++ " - " ++ aTitle) (qBody ++ aPrefix) aBody
 
 parseMoodleMD :: String -> Either ParseError [Question]
 parseMoodleMD = pandoc2questions . readMarkdown def
