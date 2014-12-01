@@ -39,12 +39,17 @@ mapLeft _ (Right r) = Right r
 numericBlock :: BlockP (NumType,NumType)
 numericBlock = undefined
 
+-- |lifts a parse result back into the parser
+reparse :: Show e => Either e a -> Parsec b () a
+reparse = either (unexpected.show) return
+
+
 answerDefList :: String -> BlockP Answers
-answerDefList qType = defList >>=
+answerDefList qType = defList >>= (reparse . parseAnswers)
     where withFeedback :: BlockP a -> BlockP (a,Text) -- could be improved by checking that a doesn't consume block quotes
           withFeedback pa = do
             a <- pa
-            fb <- fmap (fromMaybe []) optionMaybe blockQuote
+            fb <- fmap (fromMaybe []) $ optionMaybe blockQuote
             return (a,fb)
 
           -- |parse one entry for a numerical question
@@ -52,7 +57,7 @@ answerDefList qType = defList >>=
           parseNumericAnswerOpt = withFeedback numericBlock
 
           parseStringAnswerOpt :: BlockP (Text,Text)
-          parseStringanswerOpt = withFeedback $ many noBlockQuotes
+          parseStringAnswerOpt = withFeedback noBlockQuotes
 
           parseAnswers :: [([Inline],[Text])] -> Either String Answers
           parseAnswers = (>>= constructQuestion) . mapLeft show . parseStringAnswers
@@ -68,7 +73,7 @@ answerDefList qType = defList >>=
           parseNumericAnswers :: [(Text,AnswerProp)] -> Either String Answers
           parseNumericAnswers = fmap Numerical . sequence . fmap seqFirst . fmap (parseNums *** id)
           parseStringAnswers :: [([Inline],[Text])] -> Either ParseError [(Text,AnswerProp)]
-          parseStringAnswers = fmap (fmap ((id *** (flip AnswerProp) []) . swap)) . freak . fmap (parseAnswerFraction *** id)
+          parseStringAnswers xs = fmap (fmap ((id *** (flip AnswerProp) []) . swap)) . freak . fmap (parseAnswerFraction *** id)
           freak :: Monad m => [(m a,[b])] -> m [(a,b)]
           freak = sequence . fmap seqFirst . concat . fmap seqSecond
           parseAnswerFraction :: [Inline] -> Either ParseError Int
