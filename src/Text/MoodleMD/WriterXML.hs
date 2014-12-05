@@ -7,14 +7,14 @@ import Text.Pandoc.SelfContained (makeSelfContained)
 
 renderAnswers :: Answers -> IO [Element]
 renderAnswers = either (sequence . fmap procTxt) (return . fmap procNum) . answerContent
-    where procTxt (txt,(AnswerProp fraction _)) = do
+    where procTxt (txt,AnswerProp fraction _) = do
                 cdata <- makeCData txt
                 let attributes = [uAttr "format" "html", uAttr "fraction" $ show fraction]
                 return . add_attrs attributes . unode "answer" $ cdata
           procNum :: ((NumType,NumType),AnswerProp) -> Element
-          procNum ((target,tolerance),(AnswerProp fraction _)) =
+          procNum ((target,tolerance),AnswerProp fraction _) =
                 add_attrs [uAttr "fraction" $ show fraction] $
-                        unode "answer" $ [unode "text" $ show target, unode "tolerance" $ show tolerance]
+                        unode "answer" [unode "text" $ show target, unode "tolerance" $ show tolerance]
 
 blocksToString :: Text -> String
 blocksToString blks = writeAsciiDoc def $ Pandoc nullMeta blks
@@ -35,7 +35,7 @@ renderQs = fmap (ppTopElement . unode "quiz") . sequence . fmap renderQ
             let typeAttr = Attr (unqual "type") (answerType answers)
             let questionName = unode "name" $ unode "text" title
             qBody <- makeCData body
-            let questionText = add_attr (uAttr "format" "html") $ unode "questiontext" $ qBody
+            let questionText = add_attr (uAttr "format" "html") $ unode "questiontext" qBody
             return $ add_attr typeAttr . unode "question" $ [questionName,questionText] ++ renderedAnswers
 
 -- |Rendering options for producing HTML with Pandoc.

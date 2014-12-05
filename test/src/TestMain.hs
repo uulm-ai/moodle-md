@@ -18,6 +18,6 @@ test_parseAllExamples = do
 test_checkMultiQuestion = do
     result <- readMoodleMDFile "test/example-input/reuse-body.md"
     questions <- assertRight result
-    assertEqual 4 $ length questions
+    assertEqual 3 $ length questions
 
 main = htfMain htf_thisModulesTests
