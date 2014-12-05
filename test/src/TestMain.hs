@@ -1,14 +1,23 @@
-import Test.HUnit
+{-# OPTIONS_GHC -F -pgmF htfpp #-}
+
 import Text.MoodleMD.Reader
+import Test.Framework
+import System.Directory
+import Data.List (isSuffixOf)
 
-exampleFiles :: [String]
-exampleFiles = fmap ("example-input/" ++) ["example.md","no-numerical.md","small-numerical.md"]
+exampleFiles :: IO [FilePath]
+exampleFiles = do
+        cont <- getDirectoryContents "test/example-input/"
+        return . fmap ("test/example-input/" ++) . filter (isSuffixOf ".md") $ cont
 
-parseFile f = TestCase $ do
-    result <- readMoodleMDFile f
-    assertBool ("file " ++ f ++ " could not be parsed") $ either (const False) (const True) result
+test_parseAllExamples = do
+        examples <- exampleFiles
+        results <- sequence $ fmap readMoodleMDFile examples
+        sequence $ fmap assertRight results
 
-checkMultiQuestion = TestCase $ do
-    result <- readMoodleMDFile
+test_checkMultiQuestion = do
+    result <- readMoodleMDFile "test/example-input/reuse-body.md"
+    questions <- assertRight result
+    assertEqual 4 $ length questions
 
-main = runTestTT . TestList $ fmap parseFile exampleFiles
+main = htfMain htf_thisModulesTests
