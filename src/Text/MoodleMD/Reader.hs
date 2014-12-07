@@ -2,14 +2,16 @@ module Text.MoodleMD.Reader (pandoc2questions, parseMoodleMD, readMoodleMDFile) 
 
 import Text.MoodleMD.Types
 import Text.Pandoc
-import Text.Parsec
+import Text.Parsec hiding ((<*>))
 import Text.Parsec.Token
 import Text.Parsec.Language (javaStyle)
 import Control.Arrow
 import Data.Tuple (swap)
 import GHC.Float
 import Data.Maybe (fromMaybe)
-import Control.Applicative (pure,(<$>))
+import Control.Applicative (pure,(<$>), (<*>))
+import Control.Monad  (mfilter)
+import Text.Pandoc.Shared (stringify)
 
 type BlockP a = Parsec [Block] () a
 
@@ -20,11 +22,11 @@ tokenParser = makeTokenParser javaStyle
 
 -- |Convert to normal string.
 textToString :: Text -> String
-textToString = writePlain def . Pandoc nullMeta
+textToString = stringify
 
 -- |For converting the question title to a normal string.
 inlinesToString :: [Inline] -> String
-inlinesToString = textToString . pure . Plain
+inlinesToString = stringify
 
 seqFirst :: Monad m => (m a,b) -> m (a,b)
 seqFirst (ma,b) = do a <- ma; return (a,b)
@@ -42,42 +44,48 @@ numericBlock = undefined
 -- |lifts a parse result back into the parser
 reparse = either (unexpected . show) return
 
-answerDefList :: String -> BlockP Answers
-answerDefList qType = defList >>= (reparse . parseAnswers)
-    where withFeedback :: BlockP a -> BlockP (a,Text) -- could be improved by checking that a doesn't consume block quotes
-          withFeedback pa = do
-            a <- pa
-            fb <- fromMaybe [] <$> optionMaybe blockQuote
-            return (a,fb)
+-- |the direct parse result for answer sections, common to all answer types
+data AnswerBlock = AnswerBlock { abTitle :: String                  -- ^Answer title, will be appended to question title
+                               , abType :: String                   -- ^type of question
+                               , abPrefix :: Text                   -- ^specific answer text, will be appended to question body
+                               , abAnswers :: [(Text,AnswerProp)] } -- ^fraction, then answer/feedback combinations
 
-          -- |parse one entry for a numerical question
-          parseNumericAnswerOpt :: BlockP ((NumType,NumType),Text)
-          parseNumericAnswerOpt = withFeedback numericBlock
+processAnswerBlock :: AnswerBlock -> Either ParseError (String,Text,Answers)
+processAnswerBlock (AnswerBlock aTitle aType aPrefix aAnswers)
+    |aType == "numerical" = undefined
+    |otherwise            = Right $ (aTitle, aPrefix, either undefined id $ makeStringAnswers aType aAnswers)
 
-          parseStringAnswerOpt :: BlockP (Text,Text)
-          parseStringAnswerOpt = withFeedback noBlockQuotes
+pAnswerBlock :: BlockP AnswerBlock
+pAnswerBlock = do
+        ((_,classes,_),title) <- headerN 2
+        qClass <- reparse $ parse pClass "question type" classes
+        prefix <- many noHeaderNoDefList
+        definitions <- defList :: BlockP [([Inline],[Text])]
+        answers <- reparse $ do
+            d <- Right definitions
+            withFracs <- convertFractions d :: Either ParseError [(Int,[Text])]
+            let withFeedback = second (fmap splitFeedback) <$> withFracs :: [(Int,[(Text,Text)])]
+            return $ makeAnswerProp <$> distributeFractions withFeedback
+        return $ AnswerBlock title (head classes) prefix answers
+    where convertFractions :: [([Inline],a)] -> Either ParseError [(Int,a)]
+          convertFractions = sequence . (fmap $ seqFirst . first parseFraction)
+          splitFeedback :: Text -> (Text,Text)
+          splitFeedback = either undefined id . parse pSplitFeedback "answer with feedback"
+          pSplitFeedback = do
+            answer <- noBlockQuotes
+            feedback <- blockQuote
+            return (answer,feedback)
 
-          parseAnswers :: [([Inline],[Text])] -> Either String Answers
-          parseAnswers = (>>= constructQuestion) . mapLeft show . parseStringAnswers
-          constructQuestion :: [(Text,AnswerProp)] -> Either String Answers
-          constructQuestion = if qType == "numerical" then parseNumericAnswers else makeStringAnswers qType
-          parseNums :: Text -> Either String (NumType,NumType)
-          parseNums = mapLeft show . parse numPair "numerical answer" . textToString
-            where buildFloat = either fromIntegral double2Float
-                  numPair = do
-                    targ <- buildFloat <$> naturalOrFloat tokenParser
-                    tol <- optionMaybe $ many (char ' ') >> string "+-" >> many (char ' ') >> (buildFloat <$> naturalOrFloat tokenParser)
-                    return (targ, fromMaybe 0.01 tol)
-          parseNumericAnswers :: [(Text,AnswerProp)] -> Either String Answers
-          parseNumericAnswers = fmap Numerical . sequence . fmap (seqFirst . first parseNums)
-          parseStringAnswers :: [([Inline],[Text])] -> Either ParseError [(Text,AnswerProp)]
-          parseStringAnswers = fmap (fmap (swap . first (flip AnswerProp []))) . parseFractionPart
-          parseFractionPart :: [([Inline],[Text])] -> Either ParseError [(Int,Text)]
-          parseFractionPart = freak . fmap (first parseAnswerFraction)
-          freak :: Monad m => [(m a,[b])] -> m [(a,b)]
-          freak = sequence . fmap seqFirst . concat . fmap seqSecond
-          parseAnswerFraction :: [Inline] -> Either ParseError Int
-          parseAnswerFraction = parse fraction "answer header" . inlinesToString
+          distributeFractions :: [(a,[(b,c)])] -> [(a,b,c)]
+          distributeFractions = fmap flatTup . concat . (seqSecond <$>) where flatTup (a,(b,c)) = (a,b,c)
+          makeAnswerProp :: (Int,Text,Text) -> (Text,AnswerProp)
+          makeAnswerProp (f,a,fb) = (a,AnswerProp f fb)
+          -- |parse the list of header classes to find the question type
+          pClass :: Parsec [String] () String
+          pClass = tokenPrim show incPos $ mfilter (`elem` ["numerical","multichoice"]) . Just
+          -- |parse the faction defition (the amount of points for an answer)
+          parseFraction :: [Inline] -> Either ParseError Int
+          parseFraction = parse fraction "answer header" . inlinesToString
               where fraction = fracTrue <|> fracFalse <|> numericFraction
                     fracTrue  = (string "true" <|> string "True" <|> string "correct" <|> string "Correct") >> return 100
                     fracFalse = (string "false" <|> string "False" <|> string "wrong" <|> string "Wrong") >> return 0
@@ -114,22 +122,15 @@ noBlockQuotes = many $ tokenPrim show incPos (\blk -> case blk of
               BlockQuote _ -> Nothing
               x            -> Just x)
 
-
 answersFromAttr :: Attr -> String
 answersFromAttr (_,classes,_) = head classes
 
 pandoc2questions :: Pandoc -> Either ParseError [Question]
 pandoc2questions (Pandoc _ text) = concat <$> parse (many pQuestionBlock) "input" text
     where
-
           -- returns (answer title, answer prefix, answers)
           pAnswerSection :: BlockP (String, [Block], Answers)
-          pAnswerSection = do
-            (aAttr, aTitle) <- headerN 2
-            aBody <- many noHeaderNoDefList
-            answers <- answerDefList $ answersFromAttr aAttr
-            skipMany noHeader
-            return (aTitle,aBody,answers)
+          pAnswerSection = reparse =<< (processAnswerBlock <$> pAnswerBlock)
 
           pQuestionBlock :: BlockP [Question]
           pQuestionBlock = do
