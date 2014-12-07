@@ -50,10 +50,14 @@ data AnswerBlock = AnswerBlock { abTitle :: String                  -- ^Answer t
                                , abPrefix :: Text                   -- ^specific answer text, will be appended to question body
                                , abAnswers :: [(Text,AnswerProp)] } -- ^fraction, then answer/feedback combinations
 
+pNumericAnswer :: Text -> Either ParseError (NumType,NumType)
+pNumericAnswer = undefined
+
 processAnswerBlock :: AnswerBlock -> Either ParseError (String,Text,Answers)
 processAnswerBlock (AnswerBlock aTitle aType aPrefix aAnswers)
-    |aType == "numerical" = undefined
-    |otherwise            = Right $ (aTitle, aPrefix, either undefined id $ makeStringAnswers aType aAnswers)
+    |aType == "numerical" = let x3 f (ma,b,c) = do a <- ma; return (f a,b,c) in
+                            fmap ((\a -> (aTitle,aPrefix,a)) . Numerical) . sequence . fmap seqFirst $ first pNumericAnswer <$> aAnswers
+    |otherwise            = Right (aTitle, aPrefix, either undefined id $ makeStringAnswers aType aAnswers)
 
 pAnswerBlock :: BlockP AnswerBlock
 pAnswerBlock = do
@@ -68,7 +72,7 @@ pAnswerBlock = do
             return $ makeAnswerProp <$> distributeFractions withFeedback
         return $ AnswerBlock title (head classes) prefix answers
     where convertFractions :: [([Inline],a)] -> Either ParseError [(Int,a)]
-          convertFractions = sequence . (fmap $ seqFirst . first parseFraction)
+          convertFractions = sequence . fmap (seqFirst . first parseFraction)
           splitFeedback :: Text -> (Text,Text)
           splitFeedback = either undefined id . parse pSplitFeedback "answer with feedback"
           pSplitFeedback = do
@@ -121,9 +125,6 @@ noBlockQuotes :: BlockP Text
 noBlockQuotes = many $ tokenPrim show incPos (\blk -> case blk of
               BlockQuote _ -> Nothing
               x            -> Just x)
-
-answersFromAttr :: Attr -> String
-answersFromAttr (_,classes,_) = head classes
 
 pandoc2questions :: Pandoc -> Either ParseError [Question]
 pandoc2questions (Pandoc _ text) = concat <$> parse (many pQuestionBlock) "input" text
