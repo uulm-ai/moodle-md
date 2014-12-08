@@ -34,6 +34,9 @@ makeStringAnswers "multichoice" as = Right $ Multichoice as
 -- makeStringAnswers "truefalse"   as = Right $ TrueFalse as
 makeStringAnswers t _ = Left $ "unknown question type: " ++ t
 
+questionClasses :: [String]
+questionClasses = ["numerical","multichoice"]
+
 -- |A question body consisting of a title, a Body, and an Answer option.
 data Question = Question String Text Answers deriving Show
 

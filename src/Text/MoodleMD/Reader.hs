@@ -51,18 +51,18 @@ data AnswerBlock = AnswerBlock { abTitle :: String                  -- ^Answer t
                                , abAnswers :: [(Text,AnswerProp)] } -- ^fraction, then answer/feedback combinations
 
 pNumericAnswer :: Text -> Either ParseError (NumType,NumType)
-pNumericAnswer = undefined
+pNumericAnswer = error "numeric parser not implemented"
 
 processAnswerBlock :: AnswerBlock -> Either ParseError (String,Text,Answers)
 processAnswerBlock (AnswerBlock aTitle aType aPrefix aAnswers)
     |aType == "numerical" = let x3 f (ma,b,c) = do a <- ma; return (f a,b,c) in
                             fmap ((\a -> (aTitle,aPrefix,a)) . Numerical) . sequence . fmap seqFirst $ first pNumericAnswer <$> aAnswers
-    |otherwise            = Right (aTitle, aPrefix, either undefined id $ makeStringAnswers aType aAnswers)
+    |otherwise            = Right (aTitle, aPrefix, either (error "unknown question type") id $ makeStringAnswers aType aAnswers)
 
 pAnswerBlock :: BlockP AnswerBlock
 pAnswerBlock = do
         ((_,classes,_),title) <- headerN 2
-        qClass <- reparse $ parse pClass "question type" classes
+        qClass <- reparse $ parse pClass "question type" classes --parse a [String] and convert back to BlockP parser
         prefix <- many noHeaderNoDefList
         definitions <- defList :: BlockP [([Inline],[Text])]
         answers <- reparse $ do
@@ -74,20 +74,19 @@ pAnswerBlock = do
     where convertFractions :: [([Inline],a)] -> Either ParseError [(Int,a)]
           convertFractions = sequence . fmap (seqFirst . first parseFraction)
           splitFeedback :: Text -> (Text,Text)
-          splitFeedback = either undefined id . parse pSplitFeedback "answer with feedback"
-          pSplitFeedback = do
-            answer <- noBlockQuotes
-            feedback <- blockQuote
-            return (answer,feedback)
-
+          splitFeedback = either (error "could not split feedback") id . parse pSplitFeedback "answer with feedback"
+                where pSplitFeedback = do
+                        answer <- noBlockQuotes
+                        feedback <- optionMaybe blockQuote
+                        return (answer, fromMaybe [] feedback)
           distributeFractions :: [(a,[(b,c)])] -> [(a,b,c)]
           distributeFractions = fmap flatTup . concat . (seqSecond <$>) where flatTup (a,(b,c)) = (a,b,c)
           makeAnswerProp :: (Int,Text,Text) -> (Text,AnswerProp)
           makeAnswerProp (f,a,fb) = (a,AnswerProp f fb)
           -- |parse the list of header classes to find the question type
           pClass :: Parsec [String] () String
-          pClass = tokenPrim show incPos $ mfilter (`elem` ["numerical","multichoice"]) . Just
-          -- |parse the faction defition (the amount of points for an answer)
+          pClass = tokenPrim show incPos $ mfilter (`elem` questionClasses) . Just
+          -- |parse the faction definition (the amount of points for an answer)
           parseFraction :: [Inline] -> Either ParseError Int
           parseFraction = parse fraction "answer header" . inlinesToString
               where fraction = fracTrue <|> fracFalse <|> numericFraction

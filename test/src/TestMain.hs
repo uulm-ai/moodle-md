@@ -23,10 +23,15 @@ test_checkMultiQuestion = do
     assertEqual 3 $ length questions
 
 test_parseQuestionFeedback = do
-    result <- assertRightVerbose "failed parsing" <$> readMoodleMDFile "test/example-input/feedback-question.md"
-    let apHasFeedback (AnswerProp _ fb) = not $ null fb
-    let getAns (Question _ _ ans) = ans
-    hasFeedback <- any apHasFeedback. either (snd <$>) (snd <$>) . answerContent . getAns . head <$> result
+    parseResult <- readMoodleMDFile "test/example-input/feedback-question.md"
+    result <- assertRightVerbose "failed parsing" parseResult
+    let hasFeedback = let apHasFeedback (AnswerProp _ fb) = not $ null fb
+                          getAns (Question _ _ ans) = ans
+                      in any apHasFeedback. either (snd <$>) (snd <$>) . answerContent . getAns . head $ result
     assertBoolVerbose "answer option has no feedback" hasFeedback
+    
+test_parseNumerical = do
+    result <- readMoodleMDFile "test/example-input/small-numerical.md"
+    assertRight result    
 
 main = htfMain htf_thisModulesTests
