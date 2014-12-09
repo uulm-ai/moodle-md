@@ -1,7 +1,14 @@
 #Features
 
- - mutliple choice questions
+ - author quizzes using markdown syntax
+ - support for latex formula syntax
+ - per answer feedback
+ - share body between different questions
+ - support for different question types
+    - numerical (with specified tolerance)
+    - mutliple choice questions
 
+#Syntax
     ```
     ##Answer {.multichoice}
     correct
