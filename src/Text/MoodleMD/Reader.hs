@@ -1,24 +1,35 @@
 module Text.MoodleMD.Reader (pandoc2questions, parseMoodleMD, readMoodleMDFile) where
 
-import Text.MoodleMD.Types
-import Text.Pandoc
-import Text.Parsec hiding ((<*>))
-import Text.Parsec.Token
-import Text.Parsec.Language (javaStyle)
-import Control.Arrow
-import Data.Tuple (swap)
-import GHC.Float
-import Data.Maybe (fromMaybe)
-import Control.Applicative (pure,(<$>), (<*>))
-import Control.Monad  (mfilter)
-import Text.Pandoc.Shared (stringify)
+import           Control.Applicative  (pure, (<$>), (<*>), (*>), (<$), empty)
+import           Control.Arrow
+import           Control.Monad        (mfilter)
+import           Data.Maybe           (fromMaybe)
+import           Data.Tuple           (swap)
+import           GHC.Float
+import           Text.MoodleMD.Types
+import           Text.Pandoc
+import           Text.Pandoc.Shared   (stringify)
+import           Text.Parsec          hiding ((<*>))
+import Text.Parsec.String
+import Numeric (readSigned, readFloat)
 
 type BlockP a = Parsec [Block] () a
 
+-- | Parse a double value. This is exactly the same code as in Real World
+-- Haskell, p. 400.
+--
+-- TODO There are some strange 'floating point numbers' running around in the
+-- wild that can not be parsed using this code. (eg.: +.5) or (+0.5)
+
+parseFloat :: GenParser Char st Double
+parseFloat = do
+  s <- getInput
+  case readSigned readFloat s of
+    [(n,s')]  -> n <$ setInput s'
+    _         -> empty
+
 -- |Helper to increment Source position parsing arbitrary lists with Parsec
 incPos pos _ _ = incSourceColumn pos 1
-
-tokenParser = makeTokenParser javaStyle
 
 -- |Convert to normal string.
 textToString :: Text -> String
@@ -38,25 +49,25 @@ mapLeft :: (a -> b) -> Either a c -> Either b c
 mapLeft f (Left x) = Left $ f x
 mapLeft _ (Right r) = Right r
 
-numericBlock :: BlockP (NumType,NumType)
-numericBlock = undefined
-
 -- |lifts a parse result back into the parser
 reparse = either (unexpected . show) return
 
 -- |the direct parse result for answer sections, common to all answer types
-data AnswerBlock = AnswerBlock { abTitle :: String                  -- ^Answer title, will be appended to question title
-                               , abType :: String                   -- ^type of question
-                               , abPrefix :: Text                   -- ^specific answer text, will be appended to question body
+data AnswerBlock = AnswerBlock { abTitle   :: String                -- ^Answer title, will be appended to question title
+                               , abType    :: String                -- ^type of question
+                               , abPrefix  :: Text                  -- ^specific answer text, will be appended to question body
                                , abAnswers :: [(Text,AnswerProp)] } -- ^fraction, then answer/feedback combinations
 
 pNumericAnswer :: Text -> Either ParseError (NumType,NumType)
-pNumericAnswer = error "numeric parser not implemented"
+pNumericAnswer = parse pNumBlock "numeric answer option" . stringify
+        where pNumBlock = do
+                target <- double2Float <$> parseFloat
+                tol <- optionMaybe $ double2Float <$> (spaces *> string "+-" *> spaces *> parseFloat)
+                return (target,fromMaybe 1e-3 tol)
 
 processAnswerBlock :: AnswerBlock -> Either ParseError (String,Text,Answers)
 processAnswerBlock (AnswerBlock aTitle aType aPrefix aAnswers)
-    |aType == "numerical" = let x3 f (ma,b,c) = do a <- ma; return (f a,b,c) in
-                            fmap ((\a -> (aTitle,aPrefix,a)) . Numerical) . sequence . fmap seqFirst $ first pNumericAnswer <$> aAnswers
+    |aType == "numerical" = fmap ((\a -> (aTitle,aPrefix,a)) . Numerical) . sequence . fmap seqFirst $ first pNumericAnswer <$> aAnswers
     |otherwise            = Right (aTitle, aPrefix, either (error "unknown question type") id $ makeStringAnswers aType aAnswers)
 
 pAnswerBlock :: BlockP AnswerBlock

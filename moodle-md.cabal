@@ -50,6 +50,7 @@ test-suite tests
                       xml,
                       parsec,
                       highlighting-kate
+
   default-language:   Haskell2010
   other-modules:      
                       Text.MoodleMD.Reader,

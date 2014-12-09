@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
+-- {-# ANN module "HLint: ignore Use camelCase" #-}
 
 import Text.MoodleMD.Reader
 import Test.Framework
