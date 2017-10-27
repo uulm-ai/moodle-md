@@ -1,4 +1,4 @@
-#Features
+# Features
 
  - author quizzes using markdown syntax
  - support for latex formula syntax
@@ -8,7 +8,7 @@
     - numerical (with specified tolerance)
     - mutliple choice questions
 
-#Syntax
+# Syntax
     ```
     ##Answer {.multichoice}
     correct
